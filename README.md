@@ -232,4 +232,87 @@ docker logs [jenkins 컨테이너 ID]
 ![image](https://user-images.githubusercontent.com/77595685/220806513-f563996d-6a47-4797-8e31-fe92e41e0cd4.png)<br>
 ![image](https://user-images.githubusercontent.com/77595685/220806594-fa60906e-3726-4df7-8b2d-7030d358e515.png)<br>
 
+## 4. 기본 파일 작성
 
+- 우선 docker-compose를 설치합니다.
+    ```bash
+    sudo apt install docker-compose
+    ```
+
+- jenkins container에 들어가서도 docker-compose를 설치합니다.
+    - root 계정으로 들어가 설치합니다.
+    ```bash
+    docker exec -itu 0 {container ID} bash
+    apt install docker-compose
+    ```
+    
+- jenkins에서 처음 실행시키는 start.sh 파일을 작성합니다.
+    ```yaml
+    docker-compose -f docker-compose.yml pull
+
+    COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f docker-compose.yml up --build -d
+
+    docker rmi -f $(docker images -f "dangling=true" -q) || true
+    ```
+
+- start.sh에서 실행시키는 docker-compose.yml 파일을 작성합니다.
+    ```yaml
+    version: "3"
+    services:
+      zookeeper:
+        image: wurstmeister/zookeeper
+        container_name: zookeeper
+        ports:
+          - "2181:2181"
+      kafka:
+        image: wurstmeister/kafka
+        container_name: kafka
+        ports:
+          - "9092:9092"
+        environment:
+          KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+      server:
+        container_name: server
+        build:
+          context: ./deployTest
+        ports:
+          - 8080:8080
+        environment:
+          - TZ=Asia/Seoul
+    ```
+    
+- 실행시키는 프로젝트 내부에 Dockerfile 파일을 작성합니다.
+    ```
+    FROM openjdk:17-jdk-slim as builder
+
+    COPY gradlew .
+    COPY gradle gradle
+    COPY build.gradle .
+    COPY settings.gradle .
+    COPY src src
+    RUN chmod +x ./gradlew
+    RUN ./gradlew bootJar
+
+    FROM openjdk:17-jdk-slim
+    COPY --from=builder build/libs/*.jar app.jar
+    EXPOSE 8080
+
+    ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-jar", "/app.jar"]
+    ```
+
+- 빌드 시 터짐 -> free tier라서
+    - 램을 2기가로 늘린다
+    ```bash
+    sudo dd if=/dev/zero of=/swapfile bs=128M count=16
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+    sudo swapon -s
+    sudo vi /etc/fstab
+    
+    # 아래 내용 입력 후 빌드
+    /swapfile swap swap defaults 0 0
+    ```
