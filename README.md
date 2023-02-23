@@ -75,7 +75,7 @@ $ sudo ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 $ date
 ```
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/e6d0a560-440e-4a81-86e0-d52a7c106f0f/Untitled.png)
+![image](https://user-images.githubusercontent.com/77595685/220799065-ec51e9c5-a370-4313-badd-8d0b415ed481.png)
 
 ## 2. EC2 환경 설정
 
