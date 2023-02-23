@@ -211,7 +211,11 @@ docker logs [jenkins 컨테이너 ID]
 ![image](https://user-images.githubusercontent.com/77595685/220804382-9ed564ce-9d42-4973-9a67-934a7c743dde.png)<br>
 ![image](https://user-images.githubusercontent.com/77595685/220804432-c86bac44-8291-48c8-bbe3-8b20d4a8c04c.png)<br>
 
-3. jenkins와 git project 연동
+3. plugin 설치
+
+![image](https://user-images.githubusercontent.com/77595685/220806331-3344afb8-cf99-4417-b58b-d509615d0796.png)<br>
+
+4. jenkins에 git project 추가
 
 ![image](https://user-images.githubusercontent.com/77595685/220804524-7fb6acc6-da3f-4964-a942-6e06b050f1ff.png)<br>
 ![image](https://user-images.githubusercontent.com/77595685/220804572-135a05db-8640-47bd-b7eb-7ff04de8e934.png)<br>
