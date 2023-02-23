@@ -167,13 +167,13 @@ docker logs [jenkins 컨테이너 ID]
 ![https://images.velog.io/images/hind_sight/post/92531a06-5df6-4983-82ae-aa5be65f560c/image.png](https://images.velog.io/images/hind_sight/post/92531a06-5df6-4983-82ae-aa5be65f560c/image.png)
 
 - 보안 그룹 설정을 해야 {public ip}:9090 에 접근할 수 있습니다.
+    - EC2 \> 보안그룹
 
-![image](https://user-images.githubusercontent.com/77595685/220798839-9358cedb-007c-4646-ab1c-238d7ce77cdd.png)
-![image](https://user-images.githubusercontent.com/77595685/220798853-af647702-ebba-4f0b-baa1-ea8c8dc04d96.png)
+![image](https://user-images.githubusercontent.com/77595685/220798853-af647702-ebba-4f0b-baa1-ea8c8dc04d96.png)<br>
 
 `인바운드 규칙 편집` 클릭
 
-![image](https://user-images.githubusercontent.com/77595685/220798865-96b343c9-9a45-4158-b2d5-95da4f4b8a86.png)
+![image](https://user-images.githubusercontent.com/77595685/220798865-96b343c9-9a45-4158-b2d5-95da4f4b8a86.png)<br>
 
 `규칙 추가` 클릭 → 유형: `TCP`, 포트 범위: {등록할 포트 번호} 
 
