@@ -194,4 +194,34 @@ docker logs [jenkins 컨테이너 ID]
 - 앞으로 이 url로 젠킨스에 접속하시면 됩니다.
 
 ### Jenkins Github 연동
-> 정리중
+
+1. github token 발급
+
+![image](https://user-images.githubusercontent.com/77595685/220803986-64abbe06-4ce8-4457-a830-b5e0d7257db9.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/220804052-29a95ca6-ae0b-4dbc-8840-aaf10944c00e.png)<br>
+
+- repo와 gist 선택
+
+![image](https://user-images.githubusercontent.com/77595685/220804100-8968d402-56d7-442f-bade-830fbfed3bec.png)<br>
+
+2. jenkins와 git 연동
+
+![image](https://user-images.githubusercontent.com/77595685/220804268-3a6f1c90-97cc-4e23-9365-75b601f1a85a.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/220804344-a666dfa7-8d8d-4f35-bc89-84ee240ae328.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/220804382-9ed564ce-9d42-4973-9a67-934a7c743dde.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/220804432-c86bac44-8291-48c8-bbe3-8b20d4a8c04c.png)<br>
+
+3. jenkins와 git project 연동
+
+![image](https://user-images.githubusercontent.com/77595685/220804524-7fb6acc6-da3f-4964-a942-6e06b050f1ff.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/220804572-135a05db-8640-47bd-b7eb-7ff04de8e934.png)<br>
+
+![image](https://user-images.githubusercontent.com/77595685/220804646-00c0aa16-cb9f-461e-8575-0fa3fb5e9922.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/220804686-28512a6a-704c-4e25-8cbc-222196198983.png)<br>
+
+![image](https://user-images.githubusercontent.com/77595685/220804720-7ec06a23-68cb-4eab-a4f2-ad2143cded52.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/220804748-6b24b737-5010-4302-88f6-1f9c976c6dbd.png)<br>
+
+
+
+
