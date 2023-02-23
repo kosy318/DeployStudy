@@ -1,23 +1,17 @@
 package com.example.deploytest;
 
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
 @RestController
+@RequestMapping("/log")
 public class LogController {
+    private final LogProducer logProducer;
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
-
-    public LogController(KafkaTemplate<String, String> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
+    public LogController(LogProducer logProducer) {
+        this.logProducer = logProducer;
     }
 
-    @PostMapping("/logs")
-    public void sendLogMessage(@RequestBody String message) {
-        ProducerRecord<String, String> record = new ProducerRecord<>("logs", message);
-        kafkaTemplate.send(record);
+    @PostMapping
+    public ResponseEntity<Void> produce(@RequestBody String message) {
+        logProducer.send(message);
+        return ResponseEntity.accepted().build();
     }
 }
