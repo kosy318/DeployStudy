@@ -226,6 +226,7 @@ docker logs [jenkins 컨테이너 ID]
 ![image](https://user-images.githubusercontent.com/77595685/220804720-7ec06a23-68cb-4eab-a4f2-ad2143cded52.png)<br>
 ![image](https://user-images.githubusercontent.com/77595685/220804748-6b24b737-5010-4302-88f6-1f9c976c6dbd.png)<br>
 
+![image](https://user-images.githubusercontent.com/77595685/220806513-f563996d-6a47-4797-8e31-fe92e41e0cd4.png)<br>
 
 
 
