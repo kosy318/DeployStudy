@@ -303,8 +303,13 @@ docker logs [jenkins 컨테이너 ID]
     ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-jar", "/app.jar"]
     ```
 
-- 빌드 시 터짐 -> free tier라서
-    - 램을 2기가로 늘린다
+- 빌드 시
+    - docker 설치 후 /var/run/docker.sock의 permission denied 발생하는 경우
+    ```bash
+    sudo chmod 666 /var/run/docker.sock
+    ```
+    - 터짐 -> free tier라서
+        - 램을 2기가로 늘린다
     ```bash
     sudo dd if=/dev/zero of=/swapfile bs=128M count=16
     sudo chmod 600 /swapfile
