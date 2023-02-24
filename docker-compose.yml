@@ -13,7 +13,6 @@ services:
     build: ./.nginx
     depends_on:
       - server
-      - client
     volumes:
       - .nginx/conf.d:/etc/nginx/conf.d
       - .nginx/zerossl:/var/www/zerossl/.well-known/pki-validation
