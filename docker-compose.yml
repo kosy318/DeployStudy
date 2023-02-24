@@ -1,36 +1,21 @@
-version: '3'
-
+version: '2'
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
+  zookeeper:
+    container_name: er-zookeeper
+    image: wurstmeister/zookeeper
     ports:
-      - 8080:8080
-    depends_on:
-      - kafka
+      - "2181:2181"
   kafka:
-    image: confluentinc/cp-kafka:6.2.1
-    environment:
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-    ports:
-      - 9092:9092
+    container_name: er-kafka
+    image: wurstmeister/kafka
     depends_on:
       - zookeeper
-    networks:
-      - kafka-net
-  zookeeper:
-    image: confluentinc/cp-zookeeper:6.2.1
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
     ports:
-      - 2181:2181
-    networks:
-      - kafka-net
-
-networks:
-  kafka-net:
-    driver: bridge
+      - "9092"
+    environment:
+      DOCKER_API_VERSION: 1.22
+      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICs: "ErJuer:1:1"  # Topic명:Partition개수:Replica개수 
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
