@@ -1,8 +1,0 @@
-spring:
-  kafka:
-    bootstrap-servers: kafka:9092
-    consumer:
-      group-id: log-aggregator
-      auto-offset-reset: earliest
-    producer:
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
