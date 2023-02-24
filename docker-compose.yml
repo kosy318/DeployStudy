@@ -8,12 +8,3 @@ services:
       - 8080:8080
     environment:
       - TZ=Asia/Seoul
-  nginx:
-    container_name: nginx
-    build: ./.nginx
-    depends_on:
-      - server
-    volumes:
-      - .nginx/conf.d:/etc/nginx/conf.d
-    ports:
-      - 80:80
