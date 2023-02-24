@@ -1,21 +1,23 @@
-version: '2'
+version: "3"
 services:
-  zookeeper:
-    container_name: er-zookeeper
-    image: wurstmeister/zookeeper
+  server:
+    container_name: server
+    build:
+      context: ./SHabit-back
     ports:
-      - "2181:2181"
-  kafka:
-    container_name: er-kafka
-    image: wurstmeister/kafka
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092"
+      - 8080:8080
     environment:
-      DOCKER_API_VERSION: 1.22
-      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICs: "ErJuer:1:1"  # Topic명:Partition개수:Replica개수 
+      - TZ=Asia/Seoul
+  nginx:
+    container_name: nginx
+    build: ./.nginx
+    depends_on:
+      - server
+      - client
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - .nginx/conf.d:/etc/nginx/conf.d
+      - .nginx/zerossl:/var/www/zerossl/.well-known/pki-validation
+      - .nginx/cert:/cert
+    ports:
+      - 80:80
+      - 443:443
