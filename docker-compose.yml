@@ -3,7 +3,7 @@ services:
   server:
     container_name: server
     build:
-      context: ./SHabit-back
+      context: ./deployTest
     ports:
       - 8080:8080
     environment:
