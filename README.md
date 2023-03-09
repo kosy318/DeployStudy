@@ -94,7 +94,36 @@ sudo update-java-alternatives --set <자바 버전 이름>   # 원하는 자바 
 ```
 ## 3. RDS
 직접 데이터베이스를 설치해서 다루게 되면 모니터링, 알람, 백업, HA 구성 등을 모두 직접 해야하는데 AWS에는 이러한 것들을 모두 지원하는 관리형 서비스 RDS를 제공한다.<br>
-하드웨어 프로비저닝, 데이터베이스 설정, 패치 및 백업과 같은 잦은 운영 작업을 자동화하여 개발자가 개발에 집중할 수 있게 지원하는 서비스이다.
+하드웨어 프로비저닝, 데이터베이스 설정, 패치 및 백업과 같은 잦은 운영 작업을 자동화하여 개발자가 개발에 집중할 수 있게 지원하는 서비스이다.<br>
+
+### 1. RDS 인스턴스 
+![image](https://user-images.githubusercontent.com/77595685/223888034-da5bc1cb-bb26-41f3-98e0-7efc48425823.png)
+![image](https://user-images.githubusercontent.com/77595685/223891168-122f6983-c5ce-4a82-89a2-b544c81bece4.png)
+![image](https://user-images.githubusercontent.com/77595685/223891215-1f2981e2-d37d-480e-80b8-7607347b66bf.png)
+![image](https://user-images.githubusercontent.com/77595685/223891491-6fe5be17-77ad-4b08-80a6-1d0295733a4f.png)
+![image](https://user-images.githubusercontent.com/77595685/223891628-9b180817-88a5-4983-8e4e-4ba9daad2e68.png)
+
+### 2. RDS 파라미터 설정
+![image](https://user-images.githubusercontent.com/77595685/223891996-9fd30e78-f8c5-4e90-b12d-7063a6850c32.png)
+
+1. 타임존
+![image](https://user-images.githubusercontent.com/77595685/223892202-52763cf7-c372-452d-a5e4-e8e85647aafe.png)
+![image](https://user-images.githubusercontent.com/77595685/223892351-d4260e99-0069-4151-9b8c-77950f1a774a.png)
+
+2. Character Set
+![image](https://user-images.githubusercontent.com/77595685/223892481-a1a86891-e05c-4a92-9024-5e04761e8136.png)
+![image](https://user-images.githubusercontent.com/77595685/223892653-7eb813e8-6b09-4f1f-b83c-871477d88d0e.png)
+![image](https://user-images.githubusercontent.com/77595685/223892716-aec3b309-a913-4928-8491-8635522bca91.png)
+
+4. Max Connection
+RDS의 Max Connection은 인스턴스 사양에 따라 자동으로 정해진다. 프리티어 사양으로는 약 60개 커넥션만 가능해서 좀 더 넉넉한 값으로 지정.<br>
+![image](https://user-images.githubusercontent.com/77595685/223892810-c0a2d8b5-389d-4594-8c1f-7bc474f0edb9.png)
+
+5. 파라미터 그룹을 DB에 연결
+![image](https://user-images.githubusercontent.com/77595685/223893200-79176caa-1426-4372-950b-ab5a2925bae0.png)
+![image](https://user-images.githubusercontent.com/77595685/223893265-46d6068b-a5b0-4068-8a02-dcc74f3838f9.png)
+![image](https://user-images.githubusercontent.com/77595685/223893319-d693e1ba-f6a5-4a10-b95f-47dac20e775c.png)
+
 
 # 자동 배포
 ## 2. EC2 환경 설정
