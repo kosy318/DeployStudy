@@ -22,33 +22,50 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class) // @WebMVCTest를 이용할 수도 있지만 속도가 느리다
 public class HelloControllerTest {
 
-        @InjectMocks
-        private HelloController target;
+    @InjectMocks
+    private HelloController target;
 
-        private MockMvc mockMvc;
+    private MockMvc mockMvc;
 
-        @BeforeEach // 각각의 테스트가 실행되기 전에 초기화함
-        public void init() {
-            mockMvc = MockMvcBuilders.standaloneSetup(target)
-                    .build();
-        }
+    @BeforeEach // 각각의 테스트가 실행되기 전에 초기화함
+    public void init() {
+        mockMvc = MockMvcBuilders.standaloneSetup(target)
+                .build();
+    }
 
-        final String hello = "hello";
+    final String hello = "hello";
 
-        @Test
-        public void hello를_리턴함() throws Exception {
-            // given
-            final String url = "/hello";
+    @Test
+    public void hello를_리턴함() throws Exception {
+        // given
+        final String url = "/hello";
 
-            // when
-            final ResultActions resultActions = mockMvc.perform(
-                    MockMvcRequestBuilders.get(url)
-            );
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.get(url)
+        );
 
-            // then
-            // HTTP Status가 OK인지 확인
-            MvcResult mvcResult = resultActions.andExpect(status().isOk()).andReturn();
-            System.out.println(mvcResult.getResponse().getContentAsString());
-        }
+        // then
+        // HTTP Status가 OK인지 확인
+        MvcResult mvcResult = resultActions.andExpect(status().isOk()).andReturn();
+        System.out.println(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void helloDto가_리턴된다() throws Exception {
+        // given
+        final String name = "hello";
+        final int amount = 1000;
+        final String url = "/hello/dto";
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get(url)
+                .param("name", name)
+                .param("amount", String.valueOf(amount)));
+
+        // then
+        MvcResult mvcResult = resultActions.andExpect(status().isOk()).andReturn();
+        System.out.println(mvcResult.getResponse().getContentAsString());
+    }
 
 }
