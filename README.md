@@ -7,7 +7,7 @@
 
 - 설정
 
-![image](https://user-images.githubusercontent.com/77595685/220796619-4c57b04c-4e69-441a-bbbc-3cd87636f2e3.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/223637589-6989a64f-4488-4d29-822b-908672ff946a.png)<br>
 ![image](https://user-images.githubusercontent.com/77595685/220796688-02c55458-c835-4bf6-89bc-e105ac49b34b.png)<br>
 ![image](https://user-images.githubusercontent.com/77595685/220796713-c8095a41-8141-423f-9fa2-8e842ac886c0.png)<br>
 
@@ -36,7 +36,7 @@ sudo ssh -i [pem키 위치] [접속 계정]@[접속할 도메인]
         - ssh 전용 폴더 생성
         
         ```jsx
-        	mkdir ~/.ssh 
+        mkdir ~/.ssh 
         cd ~/.ssh // ssh 폴더 생성 및 이동
         cp [로컬 pem 키 위치] ~/.ssh // pem 키 옮기기
         vi config  // config 파일 생성
@@ -59,7 +59,11 @@ sudo ssh -i [pem키 위치] [접속 계정]@[접속할 도메인]
         
 
 ### 2. **EC2 초기 설정**
+1. sudo apt update: APT 패키지 관리자가 사용하는 로컬 패키지 리스트를 최신 버전으로 업데이트하는 명령어입니다. 시스템에 설치된 패키지를 최신 상태로 유지하기 위해 필요한 업데이트가 있는지 확인할 수 있습니다.
 
+2. sudo apt upgrade: 시스템에 설치된 모든 패키지를 최신 버전으로 업그레이드합니다. 업그레이드 할 패키지의 목록이 표시되며, 업그레이드를 계속할 것인지 묻는 메시지가 표시됩니다.
+
+3. sudo apt install build-essential: C/C++ 컴파일러를 비롯하여 빌드 과정에서 필요한 다양한 도구와 라이브러리를 설치하는 명령어입니다. C/C++ 프로그램을 컴파일하거나 라이브러리를 빌드하는 데 필요한 패키지들이 자동으로 설치됩니다. build-essential 패키지와 의존성 패키지들이 설치됩니다.
 ```bash
 $ sudo apt update
 $ sudo apt upgrade
@@ -77,6 +81,22 @@ $ date
 
 ![image](https://user-images.githubusercontent.com/77595685/220799065-ec51e9c5-a370-4313-badd-8d0b415ed481.png)
 
+# 수동 배포
+## 2. EC2 환경 설정
+### 1. Java 17 설치
+```bash
+$ sudo apt install openjdk-17-jdk
+```
+
+```bash
+sudo update-java-alternatives --list   # 설치된 자바 버전 목록 표시
+sudo update-java-alternatives --set <자바 버전 이름>   # 원하는 자바 버전으로 변경
+```
+## 3. RDS
+직접 데이터베이스를 설치해서 다루게 되면 모니터링, 알람, 백업, HA 구성 등을 모두 직접 해야하는데 AWS에는 이러한 것들을 모두 지원하는 관리형 서비스 RDS를 제공한다.<br>
+하드웨어 프로비저닝, 데이터베이스 설정, 패치 및 백업과 같은 잦은 운영 작업을 자동화하여 개발자가 개발에 집중할 수 있게 지원하는 서비스이다.
+
+# 자동 배포
 ## 2. EC2 환경 설정
 
 ### 1. Docker 설치
