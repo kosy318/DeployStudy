@@ -7,7 +7,7 @@
 
 - 설정
 
-![image](https://user-images.githubusercontent.com/77595685/220796619-4c57b04c-4e69-441a-bbbc-3cd87636f2e3.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/223637589-6989a64f-4488-4d29-822b-908672ff946a.png)<br>
 ![image](https://user-images.githubusercontent.com/77595685/220796688-02c55458-c835-4bf6-89bc-e105ac49b34b.png)<br>
 ![image](https://user-images.githubusercontent.com/77595685/220796713-c8095a41-8141-423f-9fa2-8e842ac886c0.png)<br>
 
@@ -36,7 +36,7 @@ sudo ssh -i [pem키 위치] [접속 계정]@[접속할 도메인]
         - ssh 전용 폴더 생성
         
         ```jsx
-        	mkdir ~/.ssh 
+        mkdir ~/.ssh 
         cd ~/.ssh // ssh 폴더 생성 및 이동
         cp [로컬 pem 키 위치] ~/.ssh // pem 키 옮기기
         vi config  // config 파일 생성
@@ -59,7 +59,11 @@ sudo ssh -i [pem키 위치] [접속 계정]@[접속할 도메인]
         
 
 ### 2. **EC2 초기 설정**
+1. sudo apt update: APT 패키지 관리자가 사용하는 로컬 패키지 리스트를 최신 버전으로 업데이트하는 명령어입니다. 시스템에 설치된 패키지를 최신 상태로 유지하기 위해 필요한 업데이트가 있는지 확인할 수 있습니다.
 
+2. sudo apt upgrade: 시스템에 설치된 모든 패키지를 최신 버전으로 업그레이드합니다. 업그레이드 할 패키지의 목록이 표시되며, 업그레이드를 계속할 것인지 묻는 메시지가 표시됩니다.
+
+3. sudo apt install build-essential: C/C++ 컴파일러를 비롯하여 빌드 과정에서 필요한 다양한 도구와 라이브러리를 설치하는 명령어입니다. C/C++ 프로그램을 컴파일하거나 라이브러리를 빌드하는 데 필요한 패키지들이 자동으로 설치됩니다. build-essential 패키지와 의존성 패키지들이 설치됩니다.
 ```bash
 $ sudo apt update
 $ sudo apt upgrade
@@ -77,6 +81,151 @@ $ date
 
 ![image](https://user-images.githubusercontent.com/77595685/220799065-ec51e9c5-a370-4313-badd-8d0b415ed481.png)
 
+# 수동 배포
+## 2. EC2 환경 설정
+### 1. Java 17 설치
+```bash
+$ sudo apt install openjdk-17-jdk
+```
+
+```bash
+sudo update-java-alternatives --list   # 설치된 자바 버전 목록 표시
+sudo update-java-alternatives --set <자바 버전 이름>   # 원하는 자바 버전으로 변경
+```
+## 3. RDS
+직접 데이터베이스를 설치해서 다루게 되면 모니터링, 알람, 백업, HA 구성 등을 모두 직접 해야하는데 AWS에는 이러한 것들을 모두 지원하는 관리형 서비스 RDS를 제공한다.<br>
+하드웨어 프로비저닝, 데이터베이스 설정, 패치 및 백업과 같은 잦은 운영 작업을 자동화하여 개발자가 개발에 집중할 수 있게 지원하는 서비스이다.<br>
+
+### 1. RDS 인스턴스 
+![image](https://user-images.githubusercontent.com/77595685/223888034-da5bc1cb-bb26-41f3-98e0-7efc48425823.png)
+![image](https://user-images.githubusercontent.com/77595685/223891168-122f6983-c5ce-4a82-89a2-b544c81bece4.png)
+![image](https://user-images.githubusercontent.com/77595685/223891215-1f2981e2-d37d-480e-80b8-7607347b66bf.png)
+![image](https://user-images.githubusercontent.com/77595685/223891491-6fe5be17-77ad-4b08-80a6-1d0295733a4f.png)
+![image](https://user-images.githubusercontent.com/77595685/223891628-9b180817-88a5-4983-8e4e-4ba9daad2e68.png)
+
+### 2. RDS 파라미터 설정
+![image](https://user-images.githubusercontent.com/77595685/223891996-9fd30e78-f8c5-4e90-b12d-7063a6850c32.png)
+
+1. 타임존
+![image](https://user-images.githubusercontent.com/77595685/223892202-52763cf7-c372-452d-a5e4-e8e85647aafe.png)
+![image](https://user-images.githubusercontent.com/77595685/223892351-d4260e99-0069-4151-9b8c-77950f1a774a.png)
+
+2. Character Set
+![image](https://user-images.githubusercontent.com/77595685/223892481-a1a86891-e05c-4a92-9024-5e04761e8136.png)
+![image](https://user-images.githubusercontent.com/77595685/223892653-7eb813e8-6b09-4f1f-b83c-871477d88d0e.png)
+![image](https://user-images.githubusercontent.com/77595685/223892716-aec3b309-a913-4928-8491-8635522bca91.png)
+
+4. Max Connection
+RDS의 Max Connection은 인스턴스 사양에 따라 자동으로 정해진다. 프리티어 사양으로는 약 60개 커넥션만 가능해서 좀 더 넉넉한 값으로 지정.<br>
+![image](https://user-images.githubusercontent.com/77595685/223892810-c0a2d8b5-389d-4594-8c1f-7bc474f0edb9.png)
+
+5. 파라미터 그룹을 DB에 연결
+![image](https://user-images.githubusercontent.com/77595685/223893200-79176caa-1426-4372-950b-ab5a2925bae0.png)
+![image](https://user-images.githubusercontent.com/77595685/223893265-46d6068b-a5b0-4068-8a02-dcc74f3838f9.png)
+![image](https://user-images.githubusercontent.com/77595685/223893319-d693e1ba-f6a5-4a10-b95f-47dac20e775c.png)
+
+### 3. 내 PC에서 RDS 접속
+![image](https://user-images.githubusercontent.com/77595685/223896344-ec887cd6-253c-4bc0-bee9-4dbbb9c5cf05.png)<br>
+그룹 ID 복사<br>
+![image](https://user-images.githubusercontent.com/77595685/223896613-36577c87-833b-4506-aae9-23ad5825b7b9.png)
+![image](https://user-images.githubusercontent.com/77595685/223896739-caba8dfb-9bf5-4de1-b5b0-8ced76a1e198.png)
+![image](https://user-images.githubusercontent.com/77595685/223896988-38fc0d6a-028c-448c-b03e-7a7990a16bc0.png)
+![image](https://user-images.githubusercontent.com/77595685/223897384-579be369-f85f-48f6-a45a-87a458e6f2f8.png)<br>
+ctrl+shift+a<br>
+![image](https://user-images.githubusercontent.com/77595685/223898360-2d96fdd5-19cd-4232-b60f-a039850e6d02.png)
+![image](https://user-images.githubusercontent.com/77595685/223899627-07884b68-aac6-42e2-806c-07f1ee63efde.png)
+
+### 4. EC2에서 RDS 접속
+```bash
+$ sudo apt install mariadb-server
+$ sudo apt install mariadb-client
+$ mysql -u 계정 -p -h Host주소(엔드포인트)
+```
+### 5. 프로젝트 배포
+- 터짐 -> free tier라서
+    - 램을 2기가로 늘린다
+```bash
+sudo dd if=/dev/zero of=/swapfile bs=128M count=16
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+sudo swapon -s
+sudo vi /etc/fstab
+
+# 아래 내용 입력 후 빌드
+/swapfile swap swap defaults 0 0
+```
+
+```bash
+$ sudo apt install git
+# 버전 확인
+$ git --version
+$ mkdir ~/app && mkdir ~/app/step1
+$ cd ~/app/step1
+$ git clone 복사한 주소
+$ cd 프로젝트 폴더 내부
+$ ./gradlew test
+```
+만약 다음과 같은 오류가 뜬다면
+```bash
+$ -bash: ./gradlew: Permission denied
+```
+다음 명령어로 실행 권한을 추가한 뒤 다시 테스트를 수행
+```bash
+$ chmod +x ./gradlew
+```
+
+- 배포 스크립트 만들기
+```bash
+vim ~/spring boot 프로젝트 바로 바깥 폴더/deploy.sh
+```
+아래 내용 작성
+```bash
+#!/bin/bash
+
+REPOSITORY=/home/ubuntu/spring boot 프로젝트 바로 바깥 폴더
+PROJECT_NAME=ttarawa
+
+cd $REPOSITORY/$PROJECT_NAME/
+
+echo "> Git Pull"
+git pull
+
+echo "> 프로젝트 build 시작"
+./gradlew build
+
+echo "> step1 디렉토리 이동"
+cd $REPOSITORY
+
+echo "> Build  파일 복사"
+cp $REPOSITORY/$PROJECT_NAME/build/libs/*.jar $REPOSITORY/
+
+echo "> 현재 구동중인 애플리케이션 pid 확인"
+CURRENT_PID=$(pgrep -f ${PROJECT_NAME}.*.jar)
+echo "현재 구동중인 애플리케이션 pid: $CURRENT_PID"
+
+if [ -z "$CURRENT_PID"]; then
+        echo "> 현재 구동중인 애플리케이션이 없으므로 종료하지 않습니다."
+else
+        echo "> kill -15 $CURRENT_PID"
+        kill -15 $CURRENT_PID
+        sleep 5
+fi
+
+echo "> 새 애플리케이션 배포"
+JAR_NAME=$(ls -tr $REPOSITORY/ | grep jar | tail -n 1)
+
+echo "> JAR Name: $JAR_NAME"
+
+nohup java -jar $REPOSITORY/$JAR_NAME 2>&1 &
+```
+실행 권한 추가 및 실행
+```bash
+chmod +x ./deploy.sh
+./deploy.sh
+```
+
+# 자동 배포
 ## 2. EC2 환경 설정
 
 ### 1. Docker 설치
@@ -308,16 +457,4 @@ docker logs [jenkins 컨테이너 ID]
     ```bash
     sudo chmod 666 /var/run/docker.sock
     ```
-    - 터짐 -> free tier라서
-        - 램을 2기가로 늘린다
-    ```bash
-    sudo dd if=/dev/zero of=/swapfile bs=128M count=16
-    sudo chmod 600 /swapfile
-    sudo mkswap /swapfile
-    sudo swapon /swapfile
-    sudo swapon -s
-    sudo vi /etc/fstab
     
-    # 아래 내용 입력 후 빌드
-    /swapfile swap swap defaults 0 0
-    ```
