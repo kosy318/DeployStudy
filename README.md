@@ -135,7 +135,95 @@ ctrl+shift+a<br>
 ![image](https://user-images.githubusercontent.com/77595685/223898360-2d96fdd5-19cd-4232-b60f-a039850e6d02.png)
 ![image](https://user-images.githubusercontent.com/77595685/223899627-07884b68-aac6-42e2-806c-07f1ee63efde.png)
 
+### 4. EC2에서 RDS 접속
+```bash
+$ sudo apt install mariadb-server
+$ sudo apt install mariadb-client
+$ mysql -u 계정 -p -h Host주소(엔드포인트)
+```
+### 5. 프로젝트 배포
+- 터짐 -> free tier라서
+    - 램을 2기가로 늘린다
+```bash
+sudo dd if=/dev/zero of=/swapfile bs=128M count=16
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+sudo swapon -s
+sudo vi /etc/fstab
 
+# 아래 내용 입력 후 빌드
+/swapfile swap swap defaults 0 0
+```
+
+```bash
+$ sudo apt install git
+# 버전 확인
+$ git --version
+$ mkdir ~/app && mkdir ~/app/step1
+$ cd ~/app/step1
+$ git clone 복사한 주소
+$ cd 프로젝트 폴더 내부
+$ ./gradlew test
+```
+만약 다음과 같은 오류가 뜬다면
+```bash
+$ -bash: ./gradlew: Permission denied
+```
+다음 명령어로 실행 권한을 추가한 뒤 다시 테스트를 수행
+```bash
+$ chmod +x ./gradlew
+```
+
+- 배포 스크립트 만들기
+```bash
+vim ~/spring boot 프로젝트 바로 바깥 폴더/deploy.sh
+```
+아래 내용 작성
+```bash
+#!/bin/bash
+
+REPOSITORY=/home/ubuntu/spring boot 프로젝트 바로 바깥 폴더
+PROJECT_NAME=ttarawa
+
+cd $REPOSITORY/$PROJECT_NAME/
+
+echo "> Git Pull"
+git pull
+
+echo "> 프로젝트 build 시작"
+./gradlew build
+
+echo "> step1 디렉토리 이동"
+cd $REPOSITORY
+
+echo "> Build  파일 복사"
+cp $REPOSITORY/$PROJECT_NAME/build/libs/*.jar $REPOSITORY/
+
+echo "> 현재 구동중인 애플리케이션 pid 확인"
+CURRENT_PID=$(pgrep -f ${PROJECT_NAME}.*.jar)
+echo "현재 구동중인 애플리케이션 pid: $CURRENT_PID"
+
+if [ -z "$CURRENT_PID"]; then
+        echo "> 현재 구동중인 애플리케이션이 없으므로 종료하지 않습니다."
+else
+        echo "> kill -15 $CURRENT_PID"
+        kill -15 $CURRENT_PID
+        sleep 5
+fi
+
+echo "> 새 애플리케이션 배포"
+JAR_NAME=$(ls -tr $REPOSITORY/ | grep jar | tail -n 1)
+
+echo "> JAR Name: $JAR_NAME"
+
+nohup java -jar $REPOSITORY/$JAR_NAME 2>&1 &
+```
+실행 권한 추가 및 실행
+```bash
+chmod +x ./deploy.sh
+./deploy.sh
+```
 
 # 자동 배포
 ## 2. EC2 환경 설정
@@ -369,16 +457,4 @@ docker logs [jenkins 컨테이너 ID]
     ```bash
     sudo chmod 666 /var/run/docker.sock
     ```
-    - 터짐 -> free tier라서
-        - 램을 2기가로 늘린다
-    ```bash
-    sudo dd if=/dev/zero of=/swapfile bs=128M count=16
-    sudo chmod 600 /swapfile
-    sudo mkswap /swapfile
-    sudo swapon /swapfile
-    sudo swapon -s
-    sudo vi /etc/fstab
     
-    # 아래 내용 입력 후 빌드
-    /swapfile swap swap defaults 0 0
-    ```
