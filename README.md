@@ -124,6 +124,18 @@ RDS의 Max Connection은 인스턴스 사양에 따라 자동으로 정해진다
 ![image](https://user-images.githubusercontent.com/77595685/223893265-46d6068b-a5b0-4068-8a02-dcc74f3838f9.png)
 ![image](https://user-images.githubusercontent.com/77595685/223893319-d693e1ba-f6a5-4a10-b95f-47dac20e775c.png)
 
+### 3. 내 PC에서 RDS 접속
+![image](https://user-images.githubusercontent.com/77595685/223896344-ec887cd6-253c-4bc0-bee9-4dbbb9c5cf05.png)<br>
+그룹 ID 복사<br>
+![image](https://user-images.githubusercontent.com/77595685/223896613-36577c87-833b-4506-aae9-23ad5825b7b9.png)
+![image](https://user-images.githubusercontent.com/77595685/223896739-caba8dfb-9bf5-4de1-b5b0-8ced76a1e198.png)
+![image](https://user-images.githubusercontent.com/77595685/223896988-38fc0d6a-028c-448c-b03e-7a7990a16bc0.png)
+![image](https://user-images.githubusercontent.com/77595685/223897384-579be369-f85f-48f6-a45a-87a458e6f2f8.png)<br>
+ctrl+shift+a<br>
+![image](https://user-images.githubusercontent.com/77595685/223898360-2d96fdd5-19cd-4232-b60f-a039850e6d02.png)
+![image](https://user-images.githubusercontent.com/77595685/223899627-07884b68-aac6-42e2-806c-07f1ee63efde.png)
+
+
 
 # 자동 배포
 ## 2. EC2 환경 설정
