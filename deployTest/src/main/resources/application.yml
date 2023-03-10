@@ -1,3 +1,11 @@
 spring:
   jpa:
     show_sql: true
+  h2:
+    console:
+      enabled: true
+
+server:
+  servlet:
+    encoding:
+      force: true

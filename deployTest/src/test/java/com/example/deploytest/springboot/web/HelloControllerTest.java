@@ -1,71 +1,43 @@
 package com.example.deploytest.springboot.web;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-@ExtendWith(MockitoExtension.class) // @WebMVCTest를 이용할 수도 있지만 속도가 느리다
+@ExtendWith(SpringExtension.class)
+@WebMvcTest(controllers = HelloController.class)
 public class HelloControllerTest {
 
-    @InjectMocks
-    private HelloController target;
-
-    private MockMvc mockMvc;
-
-    @BeforeEach // 각각의 테스트가 실행되기 전에 초기화함
-    public void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(target)
-                .build();
-    }
-
-    final String hello = "hello";
+    @Autowired
+    private MockMvc mvc;
 
     @Test
-    public void hello를_리턴함() throws Exception {
-        // given
-        final String url = "/hello";
+    public void hello가_리턴된다() throws Exception {
+        String hello = "hello";
 
-        // when
-        final ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.get(url)
-        );
-
-        // then
-        // HTTP Status가 OK인지 확인
-        MvcResult mvcResult = resultActions.andExpect(status().isOk()).andReturn();
-        System.out.println(mvcResult.getResponse().getContentAsString());
+        mvc.perform(get("/hello"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(hello));
     }
 
     @Test
     public void helloDto가_리턴된다() throws Exception {
-        // given
-        final String name = "hello";
-        final int amount = 1000;
-        final String url = "/hello/dto";
+        String name = "hello";
+        int amount = 1000;
 
-        // when
-        final ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get(url)
+        mvc.perform(get("/hello/dto")
                 .param("name", name)
-                .param("amount", String.valueOf(amount)));
-
-        // then
-        MvcResult mvcResult = resultActions.andExpect(status().isOk()).andReturn();
-        System.out.println(mvcResult.getResponse().getContentAsString());
+                .param("amount", String.valueOf(amount)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is(name)))
+                .andExpect(jsonPath("$.amount", is(amount)));
     }
 
 }
