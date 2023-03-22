@@ -1,5 +1,4 @@
 # 배포 방법
-> 참고 자료 : [@wlwlsus 이 정리한 포팅 매뉴얼](https://relieved-cave-3bc.notion.site/Porting-Manual-932047becc7a4711b37f1af2e913ec80)
 ## 인스턴스 생성
 - 인스턴스 시작 클릭
 
@@ -427,3 +426,312 @@ url 복사
 생성된 token 복사 후 gitlab project에 붙여넣기
 
 ![image](https://user-images.githubusercontent.com/77595685/226778642-ba29339f-0846-4819-a3e6-931ae08048a0.png)
+
+# 무중단 배포 → Nginx
+
+Tags: 배포
+
+# 1. Rolling Update 배포
+
+<aside>
+💡 새로 배포되어야 하는 버전을 하나씩 순차적으로 적용시키면서 배포하는 방식입니다. 한 번에 모두 배포되는 게 아니기 때문에 배포가 되는 과정에서 옛날 버전과 새로운 버전이 공존합니다. 그렇기 때문에 **잘못하면 배포하는 과정 중에 호환성 문제가 생길 수 있습니다**
+
+</aside>
+
+# 2. Blue, Green 배포
+
+- 참고
+    
+    [docker-nginx/README.md at master · twer4774/docker-nginx](https://github.com/twer4774/docker-nginx/blob/master/README.md)
+    
+
+<aside>
+💡 Blue 혹은 Green 버전 둘 중 하나로 배포되어 있는 상태에서 새로운 버전을 동시에 띄우고 로드밸런서를 통해서 스위칭하는 방식이며, 한 번에 두 개의 버전을 동시에 띄우기 때문에 시스템 **자원이 두배로 든다는 단점이 있습니다.**
+
+</aside>
+
+## Nginx 설치
+
+### nginx-Dockerfile
+
+```bash
+FROM nginx:1.11
+  
+RUN rm -rf /etc/nginx/conf.d/default.conf
+
+COPY ./conf.d/app.conf /etc/nginx/conf.d/app.conf
+COPY ./conf.d/nginx.conf /etc/nginx/nginx.conf
+
+VOLUME ["/data", "/etc/nginx", "/var/log/nginx"]
+
+WORKDIR /etc/nginx
+
+CMD ["nginx"]
+
+EXPOSE 80
+```
+
+### ./conf.d/app.conf
+
+```bash
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name "";
+
+    access_log off;
+
+    location / {
+        proxy_pass http://docker-app;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto http;
+        proxy_max_temp_file_size 0;
+
+        proxy_connect_timeout 150;
+        proxy_send_timeout 100;
+        proxy_read_timeout 100;
+
+        proxy_buffer_size 8k;
+        proxy_buffers 4 32k;
+        proxy_busy_buffers_size 64k;
+        proxy_temp_file_write_size 64k;
+    }
+}
+```
+
+### ./conf.d/nginx.conf
+
+```bash
+daemon off;
+user www-data;
+worker_processes 2;
+
+error_log /var/log/nginx/error.log warn;
+pid /var/run/nginx.pid;
+
+events {
+    worker_connections 1024;
+    use epoll;
+    accept_mutex off;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+    default_type application/octet-stream;
+
+    upstream docker-app {
+        least_conn;
+        server j8a605.p.ssafy.io:8085 weight=10 max_fails=3 fail_timeout=30s;
+        server j8a605.p.ssafy.io:8086 weight=10 max_fails=3 fail_timeout=30s;
+    }
+
+    log_format main '$remote_addr - $remote_user [$time_local] "$request"'
+    '$status $body_bytes_sent "$http_referer"'
+    '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log /var/log/nginx/access.log main;
+
+    sendfile on;
+    #tcp_nopush
+
+    keepalive_timeout 65;
+
+    client_max_body_size 300m;
+    client_body_buffer_size 128k;
+
+    gzip on;
+    gzip_http_version 1.0;
+    gzip_comp_level 6;
+    gzip_min_length 0;
+    gzip_buffers 16 8k;
+    gzip_proxied any;
+    gzip_types text/plain text/css text/xml text/javascript application/xml application/xml+rss application/javascript application/json;
+    gzip_disable "MSIE [1-6]\.";
+    gzip_vary on;
+
+    #리눅스환경에서 취급하는 호스팅하는 웹서버 경로
+    include /etc/nginx/conf.d/*.conf;
+
+}
+```
+
+### nginx 실행
+
+```bash
+docker build -t docker-nginx:0.1 -f nginx-Dockerfile .
+
+docker run -d --name docker-nginx -p 80:80 docker-nginx:0.1
+```
+
+## Spring Boot Application 작성
+
+### application.yml
+
+```bash
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+      generate-ddl: false
+      show-sql: true
+  datasource:
+    # mariaDB setting
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://j8a605.p.ssafy.io:3306/ssafy605
+    username: ssafy605
+    password: ssafy605
+
+server:
+  port: 8080
+```
+
+### docker-compose.blue.yml
+
+```bash
+version: '3.8'
+
+services:
+  app:
+    image: app:0.1
+    container_name: app_blue
+    environment:
+      - "spring_profiles_active=blue"
+    ports:
+      - "8085:8080"
+```
+
+### docker-compose.green.yml
+
+```bash
+version: '3.8'
+
+services:
+  app:
+    image: app:0.2
+    container_name: app_green
+    environment:
+      - "spring_profiles_active=green"
+    ports:
+      - "8086:8080"
+```
+
+## 배포 스크립트 작성
+
+jenkins 내부 execute shell
+
+```bash
+cd ttarawa
+chmod +x ./gradlew
+./gradlew bootJar
+chmod +x deploy.sh
+./deploy.sh
+```
+
+### deploy.sh
+
+```bash
+#!/bin/bash
+
+function create_docker_image_blue(){
+
+  echo "> blue docker image 만들기"
+
+  ./gradlew clean build
+
+  docker build -t app:0.1 .
+
+}
+
+function create_docker_image_green(){
+
+  echo "> green docker image 만들기"
+
+  ./gradlew clean build
+
+  docker build -t app:0.2 .
+}
+
+function execute_blue(){
+    docker ps -q --filter "name=app_blue" || grep -q . && docker stop app_blue && docker rm app_blue || true
+
+    sleep 10
+
+    docker-compose -p app-blue -f docker-compose.blue.yml up -d
+
+    sleep 10
+
+    echo "GREEN:8086 종료"
+    docker-compose -p app-green -f docker-compose.green.yml down
+
+    #dangling=true : 불필요한 이미지 지우기
+    docker rmi -f $(docker images -f "dangling=true" -q) || true
+}
+
+function execute_green(){
+  docker ps -q --filter "name=app_green" || grep -q . && docker stop app_green && docker rm app_green || true
+
+    echo "GREEN:8086 실행"
+    docker-compose -p app-green -f docker-compose.green.yml up -d
+
+    sleep 10
+
+    echo "BLUE:8085 종료"
+    docker-compose -p app-blue -f docker-compose.blue.yml down
+
+    #dangling=true : 불필요한 이미지 지우기
+    docker rmi -f $(docker images -f "dangling=true" -q) || true
+}
+
+# 현재 사용중인 어플리케이션 확인
+# 8086포트의 값이 없으면 8085포트 사용 중
+# shellcheck disable=SC2046
+RUNNING_GREEN=$(docker ps -aqf "name=app_green")
+RUNNING_BLUE=$(docker ps -aqf "name=app_blue")
+
+echo ${RUNNING_GREEN}
+echo ${RUNNING_BLUE}
+
+# Blue or Green
+if [ -z ${RUNNING_GREEN} ]
+  then
+    # 초기 실행 : BLUE도 실행중이지 않을 경우
+    if [ -z ${RUNNING_BLUE} ]
+    then
+      echo "구동 앱 없음 => BLUE 실행"
+
+      create_docker_image_blue
+
+      sleep 10
+
+      docker-compose -p app-blue -f docker-compose.blue.yml up -d
+	  
+    else
+      # 8086포트로 어플리케이션 구동
+      echo "BLUE:8085 실행 중"
+
+      create_docker_image_green
+
+      execute_green
+
+    fi
+else
+    # 8085포트로 어플리케이션 구동
+    echo "GREEN:8086 실행 중"
+
+    echo "BLUE:8085 실행"
+
+    create_docker_image_blue
+
+    execute_blue
+
+fi
+
+# 새로운 어플리케이션 구동 후 현재 어플리케이션 종료
+#kill -15 ${RUNNING_PORT_PID}
+```
