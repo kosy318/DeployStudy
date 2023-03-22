@@ -311,7 +311,7 @@ jenkins$ docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
 
 ![image](https://user-images.githubusercontent.com/77595685/226778536-2b1acb45-7f42-41c3-b97d-caabeb6702bf.png)
 
-[젠킨스 jdk 버전 11로 올리는 방법](https://www.blog.ecsimsw.com/entry/젠킨스-jdk-버전-11로-올리는-방법)
+참고 사이트 : [젠킨스 jdk 버전 11로 올리는 방법](https://www.blog.ecsimsw.com/entry/젠킨스-jdk-버전-11로-올리는-방법)
 
 ### Docker-compose 설치
 
@@ -428,8 +428,6 @@ url 복사
 ![image](https://user-images.githubusercontent.com/77595685/226778642-ba29339f-0846-4819-a3e6-931ae08048a0.png)
 
 # 무중단 배포 → Nginx
-
-Tags: 배포
 
 1. Rolling Update 배포
 
