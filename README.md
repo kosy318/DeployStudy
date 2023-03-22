@@ -310,7 +310,7 @@ jenkins$ docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
 
 17로 올림
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/bfa44f31-bab1-4d86-8291-a4d74f8e727f/Untitled.png)
+![image](https://user-images.githubusercontent.com/77595685/226778536-2b1acb45-7f42-41c3-b97d-caabeb6702bf.png)
 
 [젠킨스 jdk 버전 11로 올리는 방법](https://www.blog.ecsimsw.com/entry/젠킨스-jdk-버전-11로-올리는-방법)
 
@@ -328,7 +328,7 @@ jenkins$ docker-compose --version
 
 ### Plugin 설치
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/df3c3516-a9ab-41e7-b378-3510ad60c8d3/Untitled.png)
+![image](https://user-images.githubusercontent.com/77595685/226778563-34f5f5aa-36d0-4a89-a57b-ba909389b352.png)
 
 ### 프로젝트에 파일들 추가
 
@@ -408,22 +408,22 @@ ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-jar", "/app.jar"]
 
 gitlab에서 토큰 복사
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/2986e8ab-039d-48d1-ae14-2744af763c5e/Untitled.png)
+![image](https://user-images.githubusercontent.com/77595685/226778584-d58bd134-dace-46bd-a103-bf2a8a2eae8a.png)
 
 빨간색 부분에 붙여넣기
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/c8e40cd9-82d9-4613-b414-49aa012dd423/Untitled.png)
+![image](https://user-images.githubusercontent.com/77595685/226778603-a0819c33-223e-4e92-aa3d-644ab8208046.png)
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/4f1f197f-a074-420b-b474-ff6d2290b7b5/Untitled.png)
+![image](https://user-images.githubusercontent.com/77595685/226778611-019826e6-d7ba-457c-aea6-b7b5e5540269.png)
 
 ### Webhook 설정
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/2729faaa-a401-46f0-9b15-86cdfc3ce562/Untitled.png)
+![image](https://user-images.githubusercontent.com/77595685/226778621-d89c8cba-3b4b-48dd-a123-47b14ce5883d.png)
 
 url 복사
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/0512c1bd-20d5-4e49-9c8a-3fae54ae442e/Untitled.png)
+![image](https://user-images.githubusercontent.com/77595685/226778631-68b80551-f014-4c5d-a127-b62f784d4a61.png)
 
 생성된 token 복사 후 gitlab project에 붙여넣기
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f3efc02e-530c-412c-9fd0-64fec92c3e8e/Untitled.png)
+![image](https://user-images.githubusercontent.com/77595685/226778642-ba29339f-0846-4819-a3e6-931ae08048a0.png)
