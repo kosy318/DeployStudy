@@ -431,24 +431,18 @@ url 복사
 
 Tags: 배포
 
-# 1. Rolling Update 배포
+1. Rolling Update 배포
 
-<aside>
-💡 새로 배포되어야 하는 버전을 하나씩 순차적으로 적용시키면서 배포하는 방식입니다. 한 번에 모두 배포되는 게 아니기 때문에 배포가 되는 과정에서 옛날 버전과 새로운 버전이 공존합니다. 그렇기 때문에 **잘못하면 배포하는 과정 중에 호환성 문제가 생길 수 있습니다**
+💡 새로 배포되어야 하는 버전을 하나씩 순차적으로 적용시키면서 배포하는 방식입니다. 한 번에 모두 배포되는 게 아니기 때문에 배포가 되는 과정에서 옛날 버전과 새로운 버전이 공존합니다. 그렇기 때문에 <b>잘못하면 배포하는 과정 중에 호환성 문제가 생길 수 있습니다</b>.
 
-</aside>
 
-# 2. Blue, Green 배포
+2. Blue, Green 배포
 
-- 참고
-    
-    [docker-nginx/README.md at master · twer4774/docker-nginx](https://github.com/twer4774/docker-nginx/blob/master/README.md)
+참고 사이트 : [docker-nginx/README.md at master · twer4774/docker-nginx](https://github.com/twer4774/docker-nginx/blob/master/README.md)
     
 
-<aside>
-💡 Blue 혹은 Green 버전 둘 중 하나로 배포되어 있는 상태에서 새로운 버전을 동시에 띄우고 로드밸런서를 통해서 스위칭하는 방식이며, 한 번에 두 개의 버전을 동시에 띄우기 때문에 시스템 **자원이 두배로 든다는 단점이 있습니다.**
+💡 Blue 혹은 Green 버전 둘 중 하나로 배포되어 있는 상태에서 새로운 버전을 동시에 띄우고 로드밸런서를 통해서 스위칭하는 방식이며, 한 번에 두 개의 버전을 동시에 띄우기 때문에 시스템 <b>자원이 두배로 든다는 단점이 있습니다.</b>
 
-</aside>
 
 ## Nginx 설치
 
