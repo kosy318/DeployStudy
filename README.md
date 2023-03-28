@@ -728,6 +728,66 @@ fi
 #kill -15 ${RUNNING_PORT_PID}
 ```
 
+# Spring Actuator
+
+<aside>
+💡 Spring Actuator는 *org.springframework.boot:spring-boot-starter-actuator*
+ 패키지를 Dependency에 추가만 해주면 바로 사용할 수 있는 기능으로, Spring boot를 사용하여 Backend를 구현할 경우 애플리케이션 모니터링 및 관리 측면에서 도움을 줄 수 있습니다.
+
+</aside>
+
+### build.gradle
+
+```
+// actuator
+implementation 'org.springframework.boot:spring-boot-starter-actuator'
+```
+
+### application.yml
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - "httpexchanges"
+          - "health"
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+
+  httpexchanges:
+    recording:
+      enabled: true
+```
+
+### ActuatorHttpExchangesConfig
+
+```java
+package com.jsdckj.ttarawa.config.actuator;
+
+import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository;
+import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ActuatorHttpExchangesConfig {
+    @Bean
+    public HttpExchangeRepository httpTraceRepository() {
+        return new InMemoryHttpExchangeRepository();
+    }
+}
+```
+
+### 접근 방법
+
+```yaml
+{ip:port}/actuator #로 접근하면 뜨는 모든 url에 접근 가능
+```
+
 # ELK + filebeat
 
 ### Errors I Experienced
