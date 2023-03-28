@@ -727,3 +727,529 @@ fi
 # 새로운 어플리케이션 구동 후 현재 어플리케이션 종료
 #kill -15 ${RUNNING_PORT_PID}
 ```
+
+# ELK + filebeat
+
+### Errors I Experienced
+
+- kibana(port 5601) doesn’t work in SSAFY
+- elastic search - failed to authenticate user [elastic] → inside of elasticsearch docker container.. cd $elasticsearch_home$/bin && ./elasticsearch-setup-passwords interactive
+- Invalid version of beats protocol → 1. ELK, Filbeat version is not equal / 2. delete “codec” in logstash.conf
+- Filebeat to logstash encoding error → tcp가 아니라 beats로 받아야함
+- Filebeat : data path already locked by another beat. Please make sure that multiple beats are not sharing the same data path → sudo rm /var/lib/filebeat/filebeat.lock
+
+### Filebeat 설치
+
+ELK와 버전 동일하게해야 호환 문제가 발생하지 않음
+
+```bash
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.12.0-amd64.deb
+sudo dpkg -i filebeat-7.12.0-amd64.deb
+```
+
+### /etc/filebeat/filebeat.yml
+
+```bash
+sudo vi /etc/filebeat/filebeat.yml
+```
+
+```yaml
+###################### Filebeat Configuration Example #########################
+
+# This file is an example configuration file highlighting only the most common
+# options. The filebeat.reference.yml file from the same directory contains all the
+# supported options with more comments. You can use it as a reference.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/filebeat/index.html
+
+# For more available modules and options, please see the filebeat.reference.yml sample
+# configuration file.
+
+# ============================== Filebeat inputs ===============================
+
+filebeat.inputs:
+
+# Each - is an input. Most options can be set at the input level, so
+# you can use different inputs for various configurations.
+# Below are the input specific configurations.
+
+- type: log
+
+  # Change to true to enable this input configuration.
+  enabled: true
+
+  # Paths that should be crawled and fetched. Glob based paths.
+  paths:
+    - /var/log/*.log
+    - /var/log/logs/*.log
+    #- c:\programdata\elasticsearch\logs\*
+
+  # Exclude lines. A list of regular expressions to match. It drops the lines that are
+  # matching any regular expression from the list.
+  #exclude_lines: ['^DBG']
+
+  # Include lines. A list of regular expressions to match. It exports the lines that are
+  # matching any regular expression from the list.
+  #include_lines: ['^ERR', '^WARN']
+
+  # Exclude files. A list of regular expressions to match. Filebeat drops the files that
+  # are matching any regular expression from the list. By default, no files are dropped.
+  #exclude_files: ['.gz$']
+
+  # Optional additional fields. These fields can be freely picked
+  # to add additional information to the crawled log files for filtering
+  #fields:
+  #  level: debug
+  #  review: 1
+
+  ### Multiline options
+
+  # Multiline can be used for log messages spanning multiple lines. This is common
+  # for Java Stack Traces or C-Line Continuation
+
+  # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
+  # Defines if the pattern set under pattern should be negated or not. Default is false.
+  #multiline.negate: false
+
+  # Match can be set to "after" or "before". It is used to define if lines should be append to a pattern
+  # that was (not) matched before or after or as long as a pattern is not matched based on negate.
+  # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
+  #multiline.match: after
+
+# filestream is an experimental input. It is going to replace log input in the future.
+- type: filestream
+
+  # Change to true to enable this input configuration.
+  enabled: false
+
+  # Paths that should be crawled and fetched. Glob based paths.
+  paths:
+    - /var/log/*.log
+    #- c:\programdata\elasticsearch\logs\*
+
+  # Exclude lines. A list of regular expressions to match. It drops the lines that are
+  # matching any regular expression from the list.
+  #exclude_lines: ['^DBG']
+
+  # Include lines. A list of regular expressions to match. It exports the lines that are
+  # matching any regular expression from the list.
+  #include_lines: ['^ERR', '^WARN']
+
+  # Exclude files. A list of regular expressions to match. Filebeat drops the files that
+  # are matching any regular expression from the list. By default, no files are dropped.
+  #prospector.scanner.exclude_files: ['.gz$']
+
+  # Optional additional fields. These fields can be freely picked
+  # to add additional information to the crawled log files for filtering
+  #fields:
+  #  level: debug
+  #  review: 1
+
+# ============================== Filebeat modules ==============================
+
+filebeat.config.modules:
+  # Glob pattern for configuration loading
+  path: ${path.config}/modules.d/*.yml
+
+  # Set to true to enable config reloading
+  reload.enabled: false
+
+  # Period on which files under path should be checked for changes
+  #reload.period: 10s
+
+# ======================= Elasticsearch template setting =======================
+
+setup.template.settings:
+  index.number_of_shards: 1
+  #index.codec: best_compression
+  #_source.enabled: false
+
+filebeat.modules:
+- module: docker
+  enabled: false
+
+# ================================== General ===================================
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+#name:
+
+# The tags of the shipper are included in their own field with each
+# transaction published.
+#tags: ["service-X", "web-tier"]
+
+# Optional fields that you can specify to add additional information to the
+# output.
+#fields:
+#  env: staging
+
+# ================================= Dashboards =================================
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards is disabled by default and can be enabled either by setting the
+# options here or by using the `setup` command.
+#setup.dashboards.enabled: false
+
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
+#setup.dashboards.url:
+
+# =================================== Kibana ===================================
+
+# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
+# This requires a Kibana endpoint configuration.
+setup.kibana:
+
+  # Kibana Host
+  # Scheme and port can be left out and will be set to the default (http and 5601)
+  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
+  host: "j8a605.p.ssafy.io:5601"
+
+  # Kibana Space ID
+  # ID of the Kibana Space into which the dashboards should be loaded. By default,
+  # the Default Space will be used.
+  #space.id:    
+
+# =============================== Elastic Cloud ================================
+
+# These settings simplify using Filebeat with the Elastic Cloud (https://cloud.elastic.co/).
+
+# The cloud.id setting overwrites the `output.elasticsearch.hosts` and
+# `setup.kibana.host` options.
+# You can find the `cloud.id` in the Elastic Cloud web UI.
+#cloud.id:
+
+# The cloud.auth setting overwrites the `output.elasticsearch.username` and
+# `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
+#cloud.auth:
+
+# ================================== Outputs ===================================
+
+# Configure what output to use when sending the data collected by the beat.
+
+# ---------------------------- Elasticsearch Output ----------------------------
+#output.elasticsearch:
+  # Array of hosts to connect to.
+  #  hosts: ["j8a605.p.ssafy.io:9200"]
+
+  # Protocol - either `http` (default) or `https`.
+  #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
+  #username: "elastic"
+  #password: "changeme"
+
+# ------------------------------ Logstash Output -------------------------------
+output.logstash:
+        #  enabled: true
+  # The Logstash hosts
+  hosts: ["j8a605.p.ssafy.io:5000"]
+
+  # Optional SSL. By default is off.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
+
+# ================================= Processors =================================
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+    #  - add_docker_metadata: 
+  - add_kubernetes_metadata: ~
+
+# ================================== Logging ===================================
+
+# Sets log level. The default log level is info.
+# Available log levels are: error, warning, info, debug
+#logging.level: debug
+
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publisher", "service".
+#logging.selectors: ["*"]
+
+# ============================= X-Pack Monitoring ==============================
+# Filebeat can export internal metrics to a central Elasticsearch monitoring
+# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
+# reporting is disabled by default.
+
+# Set to true to enable the monitoring reporter.
+#monitoring.enabled: false
+
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# Filebeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:
+
+# Uncomment to send the metrics to Elasticsearch. Most settings from the
+# Elasticsearch output are accepted here as well.
+# Note that the settings should point to your Elasticsearch *monitoring* cluster.
+# Any setting that is not set is automatically inherited from the Elasticsearch
+# output configuration, so if you have the Elasticsearch output configured such
+# that it is pointing to your Elasticsearch monitoring cluster, you can simply
+# uncomment the following line.
+#monitoring.elasticsearch:
+
+# ============================== Instrumentation ===============================
+# Instrumentation support for the filebeat.
+#instrumentation:
+    # Set to true to enable instrumentation of filebeat.
+    #enabled: false
+
+    # Environment in which filebeat is running on (eg: staging, production, etc.)
+    #environment: ""
+
+    # APM Server hosts to report instrumentation results to.
+    #hosts:
+    #  - http://localhost:8200
+
+    # API Key for the APM Server(s).
+    # If api_key is set then secret_token will be ignored.
+    #api_key:
+
+    # Secret token for the APM Server(s).
+    #secret_token:
+
+# ================================= Migration ==================================
+
+# This allows to enable 6.7 migration aliases
+#migration.6_to_7.enabled: true
+```
+
+### docker-compose.yml for ELK
+
+```yaml
+version: '2'
+  
+services:
+  elasticsearch:
+    container_name: elasticsearch
+    build:
+      context: elasticsearch/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    volumes:
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx1G -Xms1G"
+      #ELASTIC_PASSWORD: changeme
+    networks:
+      - elk
+
+  logstash:
+    container_name: logstash
+    build:
+      context: logstash/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    volumes:
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "5000:5000"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx1G -Xms1G"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    container_name: kibana
+    build:
+      context: kibana/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "5601:5601"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+networks:
+
+  elk:
+    driver: bridge
+```
+
+```bash
+docker-compose down --rmi all
+docker-compose build && docker-compose up -d
+```
+
+### .env
+
+```yaml
+ELK_VERSION=7.12.0
+```
+
+### ./logstash/pipeline/logstash.conf
+
+```yaml
+input {
+       # FileBeat를 통해 로그 수신
+       beats {
+               port => 5000
+               host => "0.0.0.0"
+       }
+
+}
+
+filter {
+       # Grok형식으로 들어오는 로그를 가공하기 위한 필터
+        grok {
+                # 로그 안에 LOGLEVEL 패턴이 있을 경우 파싱하여 log_level이라는 필드로 추가
+                # [INFO ]와 같이 스페이스를 남기는 설정을 고려하여 파싱함
+                match => [
+                    "message", "\[%{LOGLEVEL:log_level}%{SPACE}*\]"
+                ]
+        }
+}
+
+output {
+       # 처리한 로그를 Elastic 서버로 전송
+       elasticsearch {
+               # TODO 각자의 서버에 맞게 IP 변경
+               hosts => "j8a605.p.ssafy.io:9200"
+               user => "elastic"
+               password => "changeme"
+               index => "logstash-%{+YYYY.MM.dd}"
+       }
+}
+```
+
+### ./logstash/config/logstash.yml
+
+```bash
+---
+## Default Logstash configuration from Logstash base image.
+## https://github.com/elastic/logstash/blob/master/docker/data/logstash/config/logstash-full.yml
+#
+http.host: "0.0.0.0"
+#xpack.monitoring.elasticsearch.hosts: [ "http://elasticsearch:9200" ]
+
+## X-Pack security credentials
+#
+#xpack.monitoring.enabled: true
+#xpack.monitoring.elasticsearch.username: elastic
+#xpack.monitoring.elasticsearch.password: changeme
+```
+
+### ./elasticsearch/config/elasticsearch.yml
+
+```yaml
+---
+## Default Elasticsearch configuration from Elasticsearch base image.
+## https://github.com/elastic/elasticsearch/blob/master/distribution/docker/src/docker/config/elasticsearch.yml
+#
+cluster.name: "docker-cluster"
+network.host: 0.0.0.0
+
+## Use single node discovery in order to disable production mode and avoid bootstrap checks
+## see https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
+#
+discovery.type: single-node
+
+## X-Pack settings
+## see https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-xpack.html
+#
+#xpack.license.self_generated.type: trial
+#xpack.security.enabled: true
+#xpack.monitoring.collection.enabled: true
+```
+
+### ./kibana/config/kibana.yml
+
+```yaml
+---
+## Default Kibana configuration from Kibana base image.
+## https://github.com/elastic/kibana/blob/master/src/dev/build/tasks/os_packages/docker_generator/templates/kibana_yml.template.js
+#
+server.name: kibana
+server.host: "0"
+elasticsearch.hosts: [ "http://j8a605.p.ssafy.io:9200" ]
+#xpack.monitoring.ui.container.elasticsearch.enabled: true
+
+## X-Pack security credentials
+#
+#elasticsearch.username: elastic
+#elasticsearch.password: changeme
+```
+
+## Spring Boot
+
+### build.gradle
+
+```yaml
+// https://mvnrepository.com/artifact/net.logstash.logback/logstash-logback-encoder
+implementation 'net.logstash.logback:logstash-logback-encoder:6.3'
+```
+
+### logback.yml
+
+```yaml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %magenta(%-4relative) --- [ %thread{10} ] %cyan(%logger{20}) : %msg%n"/>
+    <property name="LOG_PATH" value="./logs"/>
+    <property name="FILE_NAME" value="ttarawa-logs"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${FILE_NAME}-json.log</file>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${FILE_NAME}_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>90</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <root level = "INFO">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
+```
+
+### application.yml
+
+```yaml
+...
+logging:
+  level:
+    com:
+      jsdckj:
+        ttarawa: info
+  config:
+    classpath:logback.xml
+```
