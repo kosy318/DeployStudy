@@ -788,6 +788,10 @@ public class ActuatorHttpExchangesConfig {
 {ip:port}/actuator #로 접근하면 뜨는 모든 url에 접근 가능
 ```
 
+![image](https://user-images.githubusercontent.com/77595685/229447410-014d50f9-4bf8-41a9-83e3-1acb0155799d.png)
+![image](https://user-images.githubusercontent.com/77595685/229447427-5c721be8-205c-4f02-a567-8c9e0567b044.png)
+
+
 # ELK + filebeat
 
 ### Errors I Experienced
@@ -805,6 +809,18 @@ ELK와 버전 동일하게해야 호환 문제가 발생하지 않음
 ```bash
 curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.12.0-amd64.deb
 sudo dpkg -i filebeat-7.12.0-amd64.deb
+```
+
+filebeat 시작
+
+```bash
+sudo systemctl start filebeat
+```
+
+filebeat log 확인
+
+```bash
+journalctl -u filebeat.service
 ```
 
 ### /etc/filebeat/filebeat.yml
@@ -1144,7 +1160,7 @@ services:
     networks:
       - elk
     depends_on:
-      - elasticsearch
+			- elasticsearch
 
 networks:
 
@@ -1176,13 +1192,11 @@ input {
 }
 
 filter {
-       # Grok형식으로 들어오는 로그를 가공하기 위한 필터
-        grok {
-                # 로그 안에 LOGLEVEL 패턴이 있을 경우 파싱하여 log_level이라는 필드로 추가
-                # [INFO ]와 같이 스페이스를 남기는 설정을 고려하여 파싱함
-                match => [
-                    "message", "\[%{LOGLEVEL:log_level}%{SPACE}*\]"
-                ]
+        json {
+                source => "message"
+        }
+        json {
+                source => "level"
         }
 }
 
@@ -1313,3 +1327,4 @@ logging:
   config:
     classpath:logback.xml
 ```
+![image](https://user-images.githubusercontent.com/77595685/229447153-889a7be9-7521-424d-a9e8-edd607f23456.png)
