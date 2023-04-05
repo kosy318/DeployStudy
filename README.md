@@ -1,3 +1,19 @@
+### <a href="https://www.notion.so/eac1ea78acd647d5a293c38851de06b5?v=7bc5d74baf9a45abb470d3577b6e27c2&pvs=4">정리해둔 Notion 페이지</a>
+
+---
+
+## 목차
+1. [배포 방법](#배포-방법)
+
+	a. [수동 배포](#수동-배포-with-free-tier)
+	
+	b. [자동 배포](#자동-배포)
+	
+2. [무중단 배포](무중단-배포-with-Nginx)
+3. [Spring Actuator](Spring-Actuator)
+4. [ELK + filebeat](ELK---filebeat)
+---
+
 # 배포 방법
 ## 인스턴스 생성
 - 인스턴스 시작 클릭
@@ -80,7 +96,7 @@ $ date
 
 ![image](https://user-images.githubusercontent.com/77595685/220799065-ec51e9c5-a370-4313-badd-8d0b415ed481.png)
 
-# 수동 배포(free tier)
+# 수동 배포 with free tier
 ## EC2 환경 설정
 ### Java 17 설치
 ```bash
@@ -427,7 +443,7 @@ url 복사
 
 ![image](https://user-images.githubusercontent.com/77595685/226778642-ba29339f-0846-4819-a3e6-931ae08048a0.png)
 
-# 무중단 배포 → Nginx
+# 무중단 배포 with Nginx
 
 1. Rolling Update 배포
 
