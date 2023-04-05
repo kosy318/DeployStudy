@@ -9,9 +9,9 @@
 	
 	b. [자동 배포](#자동-배포)
 	
-2. [무중단 배포](무중단-배포-with-nginx)
-3. [Spring Actuator](spring-actuator)
-4. [ELK + filebeat](elk---filebeat)
+2. [무중단 배포](#무중단-배포-with-nginx)
+3. [Spring Actuator](#spring-actuator)
+4. [ELK + filebeat](#elk--filebeat)
 ---
 
 # 배포 방법
