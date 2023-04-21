@@ -12,6 +12,7 @@
 2. [무중단 배포](#무중단-배포-with-nginx)
 3. [Spring Actuator](#spring-actuator)
 4. [ELK + filebeat](#elk--filebeat)
+5. [S3](#S3)
 ---
 
 # 배포 방법
@@ -1344,3 +1345,42 @@ logging:
     classpath:logback.xml
 ```
 ![image](https://user-images.githubusercontent.com/77595685/229447153-889a7be9-7521-424d-a9e8-edd607f23456.png)
+
+# S3
+### 버킷 설정
+![image](https://user-images.githubusercontent.com/77595685/233512413-6bb68440-bd5e-4e37-9b91-a78618e52a4f.png)<br>
+
+### 버킷 권한 설정
+![image](https://user-images.githubusercontent.com/77595685/233512510-d007a81c-a12c-40cc-b49c-e8ab9fbf12f6.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/233512581-04d086d9-f499-4693-8eea-e288bc00c8a3.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/233512779-0846e7ac-206a-40e8-9b46-c3ccef266c53.png)<br>
+
+- Action에는 `GetObject, PutObject, DeleteObject` 3개를 체크하고 ARN에는 복사해둔 ARN값을 입력한다.
+- `ARN값을 입력하되 /* 값도 추가`해줘야한다.
+
+![image](https://user-images.githubusercontent.com/77595685/233512879-a39ce563-0e89-42b5-8293-deeeb7f712cc.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/233513035-6b93929f-fe18-4796-b3e1-6f961d9b17e5.png)<br>
+
+### 사용자 설정
+![image](https://user-images.githubusercontent.com/77595685/233513126-1708ceac-31be-4404-a2db-b3c1f5e33c53.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/233513159-2749dcb7-4e8c-48dc-ab07-1489dcd72c70.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/233513299-fa8e9dcd-0ef9-49da-ae54-99b6ac8d36df.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/233513619-8d888792-72a9-4dcf-8e22-a22bbe04b46c.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/233513762-04701fdb-1d6b-44df-94b3-8de38f1cfa5b.png)<br>
+![image](https://user-images.githubusercontent.com/77595685/233513835-f06bbc95-ef58-480f-bb86-d6dd9b456500.png)<br>
+
+### 발급 받은 key 등록
+<b>application.yml</b>
+```
+cloud:
+  aws:
+    s3:
+      bucket: 버킷 이름
+    region:
+      static: ap-northeast-2 #Asia Pacific -> seoul
+    stack:
+      auto: false
+    credentials:
+      access-key: S3 사용자 access-key
+      secret-key: S3 사용자 secret-key
+```
