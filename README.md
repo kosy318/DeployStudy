@@ -1365,6 +1365,7 @@ logging:
 ![image](https://user-images.githubusercontent.com/77595685/233513126-1708ceac-31be-4404-a2db-b3c1f5e33c53.png)<br><br>
 ![image](https://user-images.githubusercontent.com/77595685/233513159-2749dcb7-4e8c-48dc-ab07-1489dcd72c70.png)<br><br>
 ![image](https://user-images.githubusercontent.com/77595685/233513299-fa8e9dcd-0ef9-49da-ae54-99b6ac8d36df.png)<br><br>
+![image](https://user-images.githubusercontent.com/77595685/233519678-e4750041-1bfd-4b6d-a0bb-b6d813b94ab6.png)<br><br>
 ![image](https://user-images.githubusercontent.com/77595685/233513619-8d888792-72a9-4dcf-8e22-a22bbe04b46c.png)<br><br>
 ![image](https://user-images.githubusercontent.com/77595685/233513762-04701fdb-1d6b-44df-94b3-8de38f1cfa5b.png)<br><br>
 ![image](https://user-images.githubusercontent.com/77595685/233513835-f06bbc95-ef58-480f-bb86-d6dd9b456500.png)<br><br>
@@ -1383,4 +1384,25 @@ cloud:
     credentials:
       access-key: S3 사용자 access-key
       secret-key: S3 사용자 secret-key
+```
+
+## error 해결
+### com.amazonaws.SdkClientException: Failed to connect to service endpoint
+
+![image](https://user-images.githubusercontent.com/77595685/233521432-8dee2baa-4178-4036-9601-8c106c1806b7.png)<br><br>
+![image](https://user-images.githubusercontent.com/77595685/233521513-376a48d4-91d1-45e8-83e4-b2b4593c9141.png)<br><br>
+
+- VM Option 등록 : -Dcom.amazonaws.sdk.disableEc2Metadata=true
+
+![image](https://user-images.githubusercontent.com/77595685/233521570-5f197256-af64-4edd-a5eb-4ab8331c8d1a.png)<br><br>
+
+
+<b>application.yml</b>
+```
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
 ```
