@@ -1418,11 +1418,14 @@ logging:
 ```
 
 # CloudFront
-- CloudFront 검색 -> 배포 생성
+<b>CloudFront 검색 -> 배포 생성</b><br>
+
 ![image](https://github.com/kosy318/DeployStudy/assets/77595685/5d5b47ff-ebbb-4b31-80f3-072ae7dd91b9)<br><br>
 ![image](https://github.com/kosy318/DeployStudy/assets/77595685/70442d6f-6011-4b00-8f25-d1d93e74cf0f)<br><br>
 ![image](https://github.com/kosy318/DeployStudy/assets/77595685/1d77be87-185c-4225-b689-83ca16c8f0be)<br><br>
 ![image](https://github.com/kosy318/DeployStudy/assets/77595685/7aec696c-415f-4131-a4bc-4691cd7f3efa)<br><br>
 ![image](https://github.com/kosy318/DeployStudy/assets/77595685/ac6fb5f6-985e-43a4-84eb-fe27879badd2)<br><br>
+![image](https://github.com/kosy318/DeployStudy/assets/77595685/46539e59-b37f-4a6c-b916-4bcd5dc8e113)<br><br>
 
+<b>배포 도메인으로 S3 접속</b>
 
