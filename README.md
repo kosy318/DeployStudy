@@ -13,6 +13,7 @@
 3. [Spring Actuator](#spring-actuator)
 4. [ELK + filebeat](#elk--filebeat)
 5. [S3](#S3)
+6. [CloudFront](#CloudFront)
 ---
 
 # 배포 방법
@@ -1177,7 +1178,7 @@ services:
     networks:
       - elk
     depends_on:
-			- elasticsearch
+      - elasticsearch
 
 networks:
 
@@ -1344,7 +1345,9 @@ logging:
   config:
     classpath:logback.xml
 ```
+
 ![image](https://user-images.githubusercontent.com/77595685/229447153-889a7be9-7521-424d-a9e8-edd607f23456.png)
+
 
 # S3
 ### 버킷 설정
@@ -1369,6 +1372,13 @@ logging:
 ![image](https://user-images.githubusercontent.com/77595685/233513619-8d888792-72a9-4dcf-8e22-a22bbe04b46c.png)<br><br>
 ![image](https://user-images.githubusercontent.com/77595685/233513762-04701fdb-1d6b-44df-94b3-8de38f1cfa5b.png)<br><br>
 ![image](https://user-images.githubusercontent.com/77595685/233513835-f06bbc95-ef58-480f-bb86-d6dd9b456500.png)<br><br>
+
+- 수정
+![image](https://github.com/kosy318/DeployStudy/assets/77595685/177ba221-4a4a-49e5-8424-f437c6841793)<br><br>
+![image](https://github.com/kosy318/DeployStudy/assets/77595685/31d35842-ec07-4de4-88fb-38fcc53d2924)<br><br>
+![image](https://github.com/kosy318/DeployStudy/assets/77595685/c1b00a48-bdda-460b-a0b8-f2a44dfffef3)<br><br>
+
+
 
 ### 발급 받은 key 등록
 <b>application.yml</b>
@@ -1406,3 +1416,13 @@ logging:
         util:
           EC2MetadataUtils: error
 ```
+
+# CloudFront
+- CloudFront 검색 -> 배포 생성
+![image](https://github.com/kosy318/DeployStudy/assets/77595685/5d5b47ff-ebbb-4b31-80f3-072ae7dd91b9)<br><br>
+![image](https://github.com/kosy318/DeployStudy/assets/77595685/70442d6f-6011-4b00-8f25-d1d93e74cf0f)<br><br>
+![image](https://github.com/kosy318/DeployStudy/assets/77595685/1d77be87-185c-4225-b689-83ca16c8f0be)<br><br>
+![image](https://github.com/kosy318/DeployStudy/assets/77595685/7aec696c-415f-4131-a4bc-4691cd7f3efa)<br><br>
+![image](https://github.com/kosy318/DeployStudy/assets/77595685/ac6fb5f6-985e-43a4-84eb-fe27879badd2)<br><br>
+
+
