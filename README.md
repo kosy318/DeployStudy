@@ -7,13 +7,15 @@
 
 	a. [수동 배포](#수동-배포-with-free-tier)
 	
-	b. [자동 배포](#자동-배포)
+	b. [자동 배포 with Jenkins](#자동-배포-jenkins)
+
+	c. [자동 배포 with Github Actions](#자동-배포-github)
 	
-2. [무중단 배포](#무중단-배포-with-nginx)
-3. [Spring Actuator](#spring-actuator)
-4. [ELK + filebeat](#elk--filebeat)
-5. [S3](#S3)
-6. [CloudFront](#CloudFront)
+3. [무중단 배포](#무중단-배포-with-nginx)
+4. [Spring Actuator](#spring-actuator)
+5. [ELK + filebeat](#elk--filebeat)
+6. [S3](#S3)
+7. [CloudFront](#CloudFront)
 ---
 
 # 배포 방법
@@ -242,7 +244,7 @@ chmod +x ./deploy.sh
 ./deploy.sh
 ```
 
-# 자동 배포
+# 자동 배포 jenkins
 ## EC2 환경 설정
 
 ### Docker 설치
@@ -444,6 +446,116 @@ url 복사
 생성된 token 복사 후 gitlab project에 붙여넣기
 
 ![image](https://user-images.githubusercontent.com/77595685/226778642-ba29339f-0846-4819-a3e6-931ae08048a0.png)
+
+# 자동 배포 github
+
+참고 사이트 : [kth990303의 코딩 블로그](https://kth990303.tistory.com/444)
+
+1. ci-backend.yml
+
+   ```yaml
+	name: Java CI with Gradle
+
+	on:
+	  push:
+	    branches:
+	      - main
+	  pull_request:
+	    branches:
+	      - main
+	
+	jobs:
+	  build:
+	    runs-on: ubuntu-latest
+	
+	    steps:
+	      - uses: actions/checkout@v3
+	
+	      - name: Set up JDK 11
+	        uses: actions/setup-java@v3
+	        with:
+	          java-version: '11'
+	          distribution: 'temurin'
+	
+	      - name: Grant execute permisson for gradlew
+	        run: chmod +x gradlew
+	
+	      - name: Build with Gradle
+	        run: ./gradlew clean build
+
+   ```
+
+2. cd-backend.yml
+
+   docker-compose는 미리 해당 위치에 넣어놔야함
+
+   ```yaml
+	name: Java CD with Gradle and Docker
+	
+	on:
+	  push:
+	    branches:
+	      - main
+	
+	jobs:
+	  deploy:
+	    runs-on: ubuntu-latest
+	
+	    steps:
+	      - uses: actions/checkout@v3
+	
+	      - name: Set up JDK 11
+	        uses: actions/setup-java@v3
+	        with:
+	          java-version: '11'
+	          distribution: 'temurin'
+	
+	      - name: make application-prod.yml
+	        run: |
+	          cd ./src/main/resources
+	          touch ./application-prod.yml
+	          echo "${{ secrets.PROD_YML }}" >> ./application-prod.yml
+	        shell: bash
+	
+	      - name: Grant execute permisson for gradlew
+	        run: chmod +x gradlew
+	
+	      - name: Build with Gradle (without Test)
+	        run: ./gradlew clean build -x test --stacktrace
+	
+	      - name: Docker Hub build & push
+	        run: |
+	          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+	          docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }} .
+	          docker images
+	          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
+	
+	      - name: Deploy to Prod WAS Server
+	        uses: appleboy/ssh-action@master
+	        with:
+	          host: ${{ secrets.WAS_HOST }}
+	          username: ${{ secrets.WAS_USERNAME }}
+	          key: ${{ secrets.WAS_KEY }}
+	          port: ${{ secrets.WAS_SSH_PORT }}
+	          script: |
+	            cd /home/ubuntu/Banking-Service/
+	            sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+	            sudo docker rm -f $(sudo docker ps -qa)
+	            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
+	            sudo docker-compose up -d
+	            sudo docker image prune -f
+   ```
+
+3. github secrets에 입력
+
+![image](https://github.com/kosy318/DeployStudy/assets/77595685/b57ee576-20bd-429d-bbd7-98ebda7338c4)
+
+*PROD_YML은 application-prod.yml에 들어갈 내용
+*WAS_HOST는 XXX.XX.XX.XXX와 같은 형식의 IP 입력
+*WAS_KEY는 PEM KEY 그대로 복붙
+*WAS_SSH_PORT는 보통 22
+*WAS_USERNAME은 들어갔을 때 username@ip-xxx-xx-xx-xxx 처럼 적혀있는 그거. 입력했던 username 사용
+
 
 # 무중단 배포 with Nginx
 
